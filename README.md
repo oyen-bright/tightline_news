@@ -1,155 +1,109 @@
 # Tightline News
 
-A production-quality Flutter news reader that pulls live headlines from the [NewsAPI](https://newsapi.org) and presents them in an Apple News-inspired interface with smooth Hero animations, offline detection, and persistent caching.
-
-Built as a portfolio piece demonstrating **Clean Architecture**, **BLoC state management**, **responsive design**, and **comprehensive testing**.
+A Flutter news reader. It pulls live headlines from [NewsAPI](https://newsapi.org) and displays them in a clean, Apple News-inspired interface with a top-story carousel, list/grid toggle, offline support, and caching between sessions.
 
 ---
 
-## Screenshots
-
-|                      Feed (List)                      |      Feed (Grid)       |             Article Detail              |
-| :---------------------------------------------------: | :--------------------: | :-------------------------------------: |
-| Horizontal top‑story carousel + vertical article list | Two‑column grid toggle | Full‑bleed hero image with SliverAppBar |
-
----
-
-## How to Run
+## Getting Started
 
 ### Prerequisites
 
-| Tool          | Version                                             |
-| ------------- | --------------------------------------------------- |
-| Flutter SDK   | ≥ 3.8.1                                             |
-| Dart          | ≥ 3.8.1 (bundled with Flutter)                      |
-| A NewsAPI key | Free at [newsapi.org](https://newsapi.org/register) |
+- Flutter SDK **≥ 3.8.1** — [install guide](https://docs.flutter.dev/get-started/install)
+- A free NewsAPI key — [register here](https://newsapi.org/register)
 
 ### Setup
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/<your-username>/tightline_news.git
+git clone https://github.com/oyen-bright/tightline_news.git
 cd tightline_news
 
 # 2. Install dependencies
 flutter pub get
 
-# 3. Add your API key
+# 3. Copy the config template and add your API key
 cp app_config.example.yaml app_config.yaml
-# Open app_config.yaml and replace YOUR_DEV_KEY_HERE with your key
+```
 
-# 4. Run code generation (DI & asset gen)
-flutter pub run build_runner build --delete-conflicting-outputs
+Open `app_config.yaml` and replace `YOUR_DEV_KEY_HERE` with your NewsAPI key:
 
-# 5. Launch the app
+```yaml
+dev:
+  baseUrl: https://newsapi.org/v2/
+  apiKey: YOUR_KEY_HERE
+```
+
+```bash
+# 4. Run the app
 flutter run
+```
+
+A `Makefile` is included as a shortcut for common commands:
+
+```bash
+make pub_get       # install dependencies
+make build_runner  # regenerate code (only needed after annotation changes)
+make test          # run tests
+make test_coverage # run tests with coverage
 ```
 
 ### Run Tests
 
 ```bash
-flutter test          # 62 tests across 10 test files
+make test
+# or: flutter test
 ```
+
+Tests cover the full stack data, state, networking, routing, and UI with no real network calls made during testing.
 
 ---
 
 ## Architecture
 
-The project follows **Clean Architecture** with a clear separation of concerns:
+The project is structured around **Clean Architecture**: the UI has no knowledge of the network, and the networking code has no knowledge of the UI. Each piece can be changed or tested independently.
 
 ```
 lib/
-├── app/                          # App shell, routing, theming
-│   ├── app.dart                  # Root widget with MultiBlocProvider
-│   ├── router.dart               # Named routes with fade transitions
-│   └── theme/
-│
-├── core/                         # Shared infrastructure
-│   ├── config/                   # YAML-based runtime config
-│   ├── di/                       # Dependency injection (get_it + injectable)
-│   ├── network/                  # Dio HTTP client, interceptors, connectivity
-│   │   └── cubit/                # NetworkCubit — monitors online/offline
-│   ├── ui/layout/                # Responsive sizing utilities
-│   └── utils/                    # SnackbarUtils and pure helpers
-│
-└── features/news/                # Feature module
-    ├── domain/                   # Business rules (no framework imports)
-    │   ├── entities/             # NewsArticle data class
-    │   └── repositories/        # Abstract ArticleRepository contract
-    ├── data/                     # Implementation details
-    │   ├── datasources/          # ArticleRemoteDataSource (Dio calls)
-    │   └── repositories/        # ArticleRepositoryImpl
-    └── presentation/             # UI layer
-        ├── cubit/                # ArticleCubit (HydratedCubit)
-        ├── screens/              # NewsFeedScreen, ArticleDetailScreen
-        └── widgets/              # Reusable UI components
+├── app/          # Root widget, routing, theme
+├── core/         # Networking, dependency injection, config
+└── features/
+    └── news/
+        ├── domain/        # Data models and repository contract
+        ├── data/          # API calls and repository implementation
+        └── presentation/  # State management, screens, widgets
 ```
 
 ### Key Decisions
 
-| Decision                            | Rationale                                                                                                                                                                                      |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **BLoC / Cubit**                    | Predictable, testable state management with clear separation from UI. Chose Cubit over full Bloc for simplicity — no complex event mapping needed.                                             |
-| **HydratedCubit**                   | Automatically persists and restores article data across app restarts, providing an instant-launch experience and offline-first caching with zero extra code.                                   |
-| **Clean Architecture layers**       | Domain layer has no Flutter/Dio imports, making business logic portable and independently testable. Data layer can be swapped (e.g., from REST to GraphQL) without touching the cubit or UI.   |
-| **Abstract repository interface**   | `ArticleRepository` is an abstract class in `domain/`; the concrete `ArticleRepositoryImpl` lives in `data/`. This enables easy mocking in tests and decouples the cubit from network details. |
-| **get_it + injectable**             | Compile-time DI code generation eliminates manual service locator wiring and catches missing registrations at build time.                                                                      |
-| **Responsive sizing**               | Custom `ResponsiveSize` utility scales all dimensions relative to a 390×844 design base, ensuring consistent layout across phone sizes without media query boilerplate.                        |
-| **Graceful error handling**         | When a refresh fails but cached data exists, the app keeps showing the cached articles and surfaces the error as a non-blocking snackbar — never clears the user's screen.                     |
-| **NetworkCubit**                    | Streams connectivity changes via `connectivity_plus` so the `OfflineBanner` widget reactively shows/hides without polling.                                                                     |
-| **Named routes + PageRouteBuilder** | Enables custom fade transitions for the detail screen while keeping navigation declarative and testable.                                                                                       |
+**Separation of concerns**
+The app is split into clear layers. Business logic lives in the domain layer with no Flutter or network dependencies — this makes it easy to test and easy to change. Swapping the API for a different data source, for example, only touches the data layer.
 
-### Test Coverage
+**Offline-first caching**
+Articles are saved to disk automatically after each successful fetch. When the user opens the app  even with no internet connection they see the last articles immediately rather than a blank loading screen. When connectivity returns, the list refreshes silently in the background.
 
-62 tests across 10 files covering:
+**State management**
+All UI state flows through a single state object: loading, loaded, or error. The screen simply reacts to whichever state is current. If a refresh fails but articles are already cached, the cached list stays on screen and a small error banner appears the screen is never blanked out by a network error.
 
-- **Entity** — JSON serialization, deserialization, `fromCacheJson` round-trip, `_formatTimeAgo` edge cases
-- **State** — `copyWith`, `hasMore`, sealed class hierarchy
-- **Cubit** — Loading flows, silent refresh, error-with-cached-data preservation, hydration (`toJson`/`fromJson`)
-- **Repository** — Success and error API response handling
-- **Network** — `NetworkCubit` stream subscription, initial check, close/cleanup
-- **Router** — Route generation, argument validation, error routes
-- **Widgets** — `OfflineBanner` show/hide transitions, `StatusMessage` loading/error variants
-- **Screen** — `NewsFeedScreen` list/grid toggle, error layout
+**Testable networking**
+The API layer sits behind an abstract interface, so tests can inject a fake implementation instead of making real network calls. This keeps tests fast and free of external dependencies.
+
+**Dependency injection**
+Each class declares what it needs, and a central setup file wires everything together at startup. This keeps individual classes small and focused.
 
 ---
 
 ## Tech Stack
 
-| Category         | Library                                         |
-| ---------------- | ----------------------------------------------- |
-| Framework        | Flutter 3.8+ / Material 3                       |
-| State Management | flutter_bloc, hydrated_bloc                     |
-| DI               | get_it, injectable                              |
-| HTTP             | Dio                                             |
-| Connectivity     | connectivity_plus                               |
-| Testing          | flutter_test, mocktail                          |
-| Code Gen         | build_runner, injectable_generator, flutter_gen |
+| Category         | Library                     |
+| ---------------- | --------------------------- |
+| Framework        | Flutter 3.8+ / Material 3   |
+| State Management | flutter_bloc, hydrated_bloc |
+| Networking       | Dio                         |
+| Connectivity     | connectivity_plus           |
+| Testing          | flutter_test, mocktail      |
 
 ---
 
 ## NewsAPI Rate Limits
 
-The app uses the [NewsAPI](https://newsapi.org) free developer tier, which has the following limits:
-
-> **100 requests per 24 hours** (50 requests per 12-hour window)
-
-When the limit is exceeded the API returns:
-
-```json
-{
-  "status": "error",
-  "code": "rateLimited",
-  "message": "You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests."
-}
-```
-
-The app catches this response (`httpStatus 429` / `code: rateLimited`) in `ArticleRepositoryImpl` and surfaces the message **"Too many requests. Please wait a moment and try again."** to the user instead of the raw API text. Previously cached articles remain visible while the error is shown as a non-blocking snackbar.
-
-To avoid hitting the limit during development, the app uses `HydratedCubit` to persist articles across sessions — so a fresh launch with cached data will not trigger an API call until the user pulls to refresh.
-
----
-
-## License
-
-This project is for portfolio/demonstration purposes.
+The free tier allows 100 requests per day. If the limit is hit, the app shows *"Too many requests. Please wait a moment and try again."* while keeping any cached articles visible. Because articles are saved between sessions, a cold launch with cached data doesn't count as a request the API is only called when the user explicitly pulls to refresh.

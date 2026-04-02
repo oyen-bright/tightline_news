@@ -18,6 +18,8 @@ import 'package:tightline_news/core/network/interceptors/error_interceptor.dart'
     as _i104;
 import 'package:tightline_news/core/network/interceptors/logging_interceptor.dart'
     as _i474;
+import 'package:tightline_news/features/news/data/datasources/article_data_source.dart'
+    as _i146;
 import 'package:tightline_news/features/news/data/datasources/article_remote_data_source.dart'
     as _i964;
 import 'package:tightline_news/features/news/data/repositories/article_repository_impl.dart'
@@ -48,11 +50,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i104.ErrorInterceptor>(),
       ),
     );
-    gh.lazySingleton<_i964.ArticleRemoteDataSource>(
+    gh.lazySingleton<_i146.ArticleDataSource>(
       () => _i964.ArticleRemoteDataSource(gh<_i985.DioClient>()),
     );
     gh.lazySingleton<_i868.ArticleRepository>(
-      () => _i315.ArticleRepositoryImpl(gh<_i964.ArticleRemoteDataSource>()),
+      () => _i315.ArticleRepositoryImpl(gh<_i146.ArticleDataSource>()),
     );
     gh.factory<_i428.ArticleCubit>(
       () => _i428.ArticleCubit(gh<_i868.ArticleRepository>()),

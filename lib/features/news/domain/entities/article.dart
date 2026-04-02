@@ -56,7 +56,7 @@ class NewsArticle {
       source: ArticleSource.fromJson(json['source']),
       author: (json['author'] ?? '') as String,
       publishedAt: publishedAt,
-      timeAgo: (json['timeAgo'] as String?) ?? _formatTimeAgo(publishedAt),
+      timeAgo: _formatTimeAgo(publishedAt),
       content: (json['content'] ?? json['description'] ?? '') as String,
     );
   }
@@ -68,7 +68,6 @@ class NewsArticle {
       'imageUrl': imageUrl,
       'source': source.toJson(),
       'author': author,
-      'timeAgo': timeAgo,
       'publishedAt': publishedAt?.toIso8601String(),
       'content': content,
     };

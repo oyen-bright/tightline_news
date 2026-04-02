@@ -2,7 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:injectable/injectable.dart';
 import 'package:tightline_news/core/network/api_response.dart';
-import 'package:tightline_news/features/news/data/datasources/article_remote_data_source.dart';
+import 'package:tightline_news/features/news/data/datasources/article_data_source.dart';
 import 'package:tightline_news/features/news/domain/entities/article.dart';
 import 'package:tightline_news/features/news/domain/repositories/article_repository.dart';
 
@@ -11,7 +11,7 @@ import 'package:tightline_news/features/news/domain/repositories/article_reposit
 class ArticleRepositoryImpl implements ArticleRepository {
   ArticleRepositoryImpl(this._remote);
 
-  final ArticleRemoteDataSource _remote;
+  final ArticleDataSource _remote;
 
   /// Returns articles for [page], totalResults count, and an optional error string.
   @override
