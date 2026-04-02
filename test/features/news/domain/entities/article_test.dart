@@ -37,14 +37,15 @@ void main() {
     });
 
     test('toJson serializes fields and round-trips correctly', () {
-      const article = NewsArticle(
+      final publishedAt = DateTime.now().subtract(const Duration(hours: 3));
+      final article = NewsArticle(
         id: 'test-id',
         title: 'Title',
         description: 'Description',
         imageUrl: 'image.jpg',
-        source: ArticleSource(name: 'Source'),
+        source: const ArticleSource(name: 'Source'),
         author: 'Author',
-        timeAgo: '3h ago',
+        publishedAt: publishedAt,
         content: 'Content body',
       );
 
@@ -53,7 +54,9 @@ void main() {
       expect(json['title'], 'Title');
       expect(json['imageUrl'], 'image.jpg');
       expect(json['source'], {'id': '', 'name': 'Source'});
-      expect(json['timeAgo'], '3h ago');
+      // timeAgo is not persisted — it is recalculated from publishedAt on load.
+      expect(json.containsKey('timeAgo'), isFalse);
+      expect(NewsArticle.fromJson(json).timeAgo, '3h ago');
     });
 
     test('timeAgo formats hours correctly', () {

@@ -40,7 +40,7 @@ void main() {
   test('emits loading then loaded on success', () async {
     when(
       () => repository.getTopHeadlines(page: 1),
-    ).thenAnswer((_) async => ([article(1)], 1, null));
+    ).thenAnswer((_) async => ([article(1)], 1, null, false));
 
     expectLater(
       cubit.stream,
@@ -53,7 +53,7 @@ void main() {
   test('emits loading then failure on error', () async {
     when(
       () => repository.getTopHeadlines(page: 1),
-    ).thenAnswer((_) async => (<NewsArticle>[], 0, 'Too many requests'));
+    ).thenAnswer((_) async => (<NewsArticle>[], 0, 'Too many requests', false));
 
     expectLater(
       cubit.stream,
@@ -73,12 +73,12 @@ void main() {
   test('silent refresh does not emit loading when already loaded', () async {
     when(
       () => repository.getTopHeadlines(page: 1),
-    ).thenAnswer((_) async => ([article(1)], 1, null));
+    ).thenAnswer((_) async => ([article(1)], 1, null, false));
     await cubit.loadTopHeadlines();
 
     when(
       () => repository.getTopHeadlines(page: 1),
-    ).thenAnswer((_) async => ([article(2)], 1, null));
+    ).thenAnswer((_) async => ([article(2)], 1, null, false));
 
     expectLater(
       cubit.stream,
@@ -112,12 +112,12 @@ void main() {
     () async {
       when(
         () => repository.getTopHeadlines(page: 1),
-      ).thenAnswer((_) async => ([article(1)], 1, null));
+      ).thenAnswer((_) async => ([article(1)], 1, null, false));
       await cubit.loadTopHeadlines();
 
       when(
         () => repository.getTopHeadlines(page: 1),
-      ).thenAnswer((_) async => (<NewsArticle>[], 0, 'Server error'));
+      ).thenAnswer((_) async => (<NewsArticle>[], 0, 'Server error', false));
 
       expectLater(
         cubit.stream,

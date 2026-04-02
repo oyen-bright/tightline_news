@@ -34,7 +34,7 @@ void main() {
       }),
     );
 
-    final (articles, totalResults, error) = await repository.getTopHeadlines(
+    final (articles, totalResults, error, _) = await repository.getTopHeadlines(
       page: 1,
     );
 
@@ -50,7 +50,7 @@ void main() {
           response({'status': 'error', 'message': 'Something went wrong'}),
     );
 
-    final (articles, _, error) = await repository.getTopHeadlines(page: 1);
+    final (articles, _, error, _) = await repository.getTopHeadlines(page: 1);
 
     expect(articles, isEmpty);
     expect(error, 'Something went wrong');
@@ -65,9 +65,11 @@ void main() {
       ),
     );
 
-    final (articles, _, error) = await repository.getTopHeadlines(page: 1);
+    final (articles, _, error, isRateLimited) = await repository
+        .getTopHeadlines(page: 1);
 
     expect(articles, isEmpty);
     expect(error, 'Too many requests. Please wait a moment and try again.');
+    expect(isRateLimited, isTrue);
   });
 }

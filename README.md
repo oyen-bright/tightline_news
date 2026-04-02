@@ -76,7 +76,7 @@ lib/
 ### Key Decisions
 
 **Separation of concerns**
-The app is split into clear layers. Business logic lives in the domain layer with no Flutter or network dependencies — this makes it easy to test and easy to change. Swapping the API for a different data source, for example, only touches the data layer.
+The app is split into clear layers. Business logic lives in the domain layer with no Flutter or network dependencies, this makes it easy to test and easy to change. Swapping the API for a different data source, for example, only touches the data layer.
 
 **Offline-first caching**
 Articles are saved to disk automatically after each successful fetch. When the user opens the app  even with no internet connection they see the last articles immediately rather than a blank loading screen. When connectivity returns, the list refreshes silently in the background.
