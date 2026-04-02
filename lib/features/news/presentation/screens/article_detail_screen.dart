@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tightline_news/core/utils/responsive_size.dart';
-import 'package:tightline_news/core/widgets/page_insets.dart';
-import 'package:tightline_news/features/news/domain/news_article.dart';
+import 'package:tightline_news/core/ui/layout/page_insets.dart';
+import 'package:tightline_news/core/ui/layout/responsive_size.dart';
+import 'package:tightline_news/features/news/domain/entities/article.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   const ArticleDetailScreen({super.key, required this.article});
@@ -39,16 +40,30 @@ class ArticleDetailScreen extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
                 tag: 'article-image-${article.id}',
-                child: Image.network(
-                  article.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade300,
-                    alignment: Alignment.center,
-                    child: Icon(Icons.image_not_supported, size: context.r(48)),
-                  ),
-                ),
+                child: article.imageUrl.isEmpty
+                    ? Container(
+                        color: Colors.grey.shade300,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: context.r(48),
+                        ),
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: article.imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) =>
+                            Container(color: Colors.grey.shade200),
+                        errorWidget: (_, __, ___) => Container(
+                          color: Colors.grey.shade300,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: context.r(48),
+                          ),
+                        ),
+                      ),
               ),
             ),
           ),
@@ -65,11 +80,11 @@ class ArticleDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (article.source.isNotEmpty)
+                  if (article.source.name.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(bottom: context.h(8)),
                       child: Text(
-                        article.source.toUpperCase(),
+                        article.source.name.toUpperCase(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFFE53935),
@@ -89,7 +104,9 @@ class ArticleDetailScreen extends StatelessWidget {
                   if (article.author.isNotEmpty || article.timeAgo.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(bottom: context.h(20)),
-                      child: Row(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+
                         children: [
                           if (article.timeAgo.isNotEmpty)
                             Text(
@@ -118,7 +135,7 @@ class ArticleDetailScreen extends StatelessWidget {
                   const Divider(),
                   SizedBox(height: context.h(16)),
                   Text(
-                    article.description,
+                    article.content,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       height: 1.7,
                       fontSize: context.r(17),
