@@ -43,5 +43,5 @@ class ApiResponse<T> {
 
   bool get isSuccess => status;
 
-  bool get isRateLimited => httpStatus == 429;
+  bool get isRateLimited => httpStatus == 429 || httpStatus == 426;
 }
