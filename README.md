@@ -106,4 +106,7 @@ Each class declares what it needs, and a central setup file wires everything tog
 
 ## NewsAPI Rate Limits
 
-The free tier allows 100 requests per day. If the limit is hit, the app shows *"Too many requests. Please wait a moment and try again."* while keeping any cached articles visible. Because articles are saved between sessions, a cold launch with cached data doesn't count as a request the API is only called when the user explicitly pulls to refresh.
+The free tier has two limits worth knowing:
+
+- **100 requests per day** — if hit, the app shows *"Too many requests. Please wait a moment and try again."* while keeping any cached articles visible. Because articles are saved between sessions, a cold launch with cached data doesn't count as a request — the API is only called when the user explicitly pulls to refresh.
+- **100 results per query** — the free tier won't return more than 100 articles per endpoint call, regardless of how many exist. The app respects this by stopping pagination at 100 articles so it never requests a page that would exceed the limit.

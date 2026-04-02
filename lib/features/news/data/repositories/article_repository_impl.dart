@@ -13,9 +13,16 @@ class ArticleRepositoryImpl implements ArticleRepository {
 
   final ArticleDataSource _remote;
 
-  /// Returns articles for [page], totalResults count, and an optional error string.
+  /// Returns articles for [page], totalResults count, optional error string, and rate-limit flag.
   @override
-  Future<(List<NewsArticle> articles, int totalResults, String? error)>
+  Future<
+    (
+      List<NewsArticle> articles,
+      int totalResults,
+      String? error,
+      bool isRateLimited,
+    )
+  >
   getTopHeadlines({int page = 1}) async {
     try {
       final ApiResponse<Map<String, dynamic>> apiResponse = await _remote
@@ -29,13 +36,15 @@ class ArticleRepositoryImpl implements ArticleRepository {
           name: 'ArticleRepositoryImpl',
         );
         // Use a friendly message for rate-limit errors (HTTP 429).
-        final message = apiResponse.isRateLimited
+        final isRateLimited = apiResponse.isRateLimited;
+        final message = isRateLimited
             ? 'Too many requests. Please wait a moment and try again.'
             : apiResponse.message.trim();
         return (
           <NewsArticle>[],
           0,
           message.isNotEmpty ? message : 'Failed to load headlines',
+          isRateLimited,
         );
       }
 
@@ -51,9 +60,14 @@ class ArticleRepositoryImpl implements ArticleRepository {
       final totalResults =
           (data['totalResults'] as num?)?.toInt() ?? articles.length;
 
-      return (articles, totalResults, null);
+      return (articles, totalResults, null, false);
     } catch (_) {
-      return (<NewsArticle>[], 0, 'Something went wrong. Please try again.');
+      return (
+        <NewsArticle>[],
+        0,
+        'Something went wrong. Please try again.',
+        false,
+      );
     }
   }
 }

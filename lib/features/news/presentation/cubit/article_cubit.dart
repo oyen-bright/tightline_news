@@ -28,7 +28,7 @@ class ArticleCubit extends HydratedCubit<ArticleState> {
       try {
         // quietly refresh in the background.
         if (previous is ArticleLoaded) {
-          final (articles, totalResults, error) = await _repository
+          final (articles, totalResults, error, _) = await _repository
               .getTopHeadlines(page: 1);
           if (error != null) {
             // Keep existing data, just add error message
@@ -47,7 +47,7 @@ class ArticleCubit extends HydratedCubit<ArticleState> {
 
         // First load or after error: show loading state.
         emit(const ArticleLoading());
-        final (articles, totalResults, error) = await _repository
+        final (articles, totalResults, error, _) = await _repository
             .getTopHeadlines(page: 1);
         if (error != null) {
           emit(ArticleFailure(error));
@@ -75,12 +75,17 @@ class ArticleCubit extends HydratedCubit<ArticleState> {
 
     try {
       final nextPage = current.page + 1;
-      final (nextArticles, _, error) = await _repository.getTopHeadlines(
-        page: nextPage,
-      );
+      final (nextArticles, _, error, isRateLimited) = await _repository
+          .getTopHeadlines(page: nextPage);
       if (error != null) {
-        // Keep existing data, just add error message
-        emit(current.copyWith(errorMessage: error));
+        // If rate-limited, cap pagination so hasMore becomes false.
+        // For other errors, leave hasMore intact so it can be retried.
+        emit(
+          current.copyWith(
+            errorMessage: error,
+            totalResults: isRateLimited ? current.articles.length : null,
+          ),
+        );
         return;
       }
 
