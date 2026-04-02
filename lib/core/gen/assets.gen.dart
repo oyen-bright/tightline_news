@@ -30,5 +30,9 @@ class $AssetsFontsGen {
 class Assets {
   const Assets._();
 
+  static const String appConfig = 'app_config.yaml';
   static const $AssetsFontsGen fonts = $AssetsFontsGen();
+
+  /// List of all assets
+  static List<String> get values => [appConfig];
 }

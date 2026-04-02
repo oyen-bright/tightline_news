@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tightline_news/features/news/domain/news_article.dart';
+import 'package:tightline_news/features/news/domain/entities/article.dart';
 import 'package:tightline_news/features/news/presentation/screens/article_detail_screen.dart';
 import 'package:tightline_news/features/news/presentation/screens/news_feed_screen.dart';
 
