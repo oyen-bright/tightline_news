@@ -1,13 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tightline_news/core/utils/responsive_size.dart';
-import 'package:tightline_news/features/news/domain/news_article.dart';
+import 'package:tightline_news/core/ui/layout/responsive_size.dart';
+import 'package:tightline_news/features/news/domain/entities/article.dart';
 
 class NewsListTile extends StatelessWidget {
-  const NewsListTile({
-    super.key,
-    required this.article,
-    required this.onTap,
-  });
+  const NewsListTile({super.key, required this.article, required this.onTap});
 
   final NewsArticle article;
   final VoidCallback onTap;
@@ -25,17 +22,17 @@ class NewsListTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (article.source.isNotEmpty)
+                  if (article.source.name.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(bottom: context.h(4)),
                       child: Text(
-                        article.source.toUpperCase(),
+                        article.source.name.toUpperCase(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.grey.shade500,
-                              letterSpacing: 1.0,
-                              fontSize: context.r(10),
-                            ),
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey.shade500,
+                          letterSpacing: 1.0,
+                          fontSize: context.r(10),
+                        ),
                       ),
                     ),
                   Text(
@@ -43,9 +40,9 @@ class NewsListTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
                   ),
                   SizedBox(height: context.h(4)),
                   Text(
@@ -53,19 +50,20 @@ class NewsListTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade500,
-                          height: 1.4,
-                        ),
+                      color: Colors.grey.shade500,
+                      height: 1.4,
+                    ),
                   ),
                   SizedBox(height: context.h(6)),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         article.timeAgo,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey.shade500,
-                              fontSize: context.r(11),
-                            ),
+                          color: Colors.grey.shade500,
+                          fontSize: context.r(11),
+                        ),
                       ),
                       if (article.author.isNotEmpty) ...[
                         Text(
@@ -75,12 +73,17 @@ class NewsListTile extends StatelessWidget {
                             fontSize: context.r(11),
                           ),
                         ),
-                        Text(
-                          article.author,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey.shade500,
-                                fontSize: context.r(11),
-                              ),
+                        Expanded(
+                          child: Text(
+                            article.author,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Colors.grey.shade500,
+                                  fontSize: context.r(11),
+                                ),
+                          ),
                         ),
                       ],
                     ],
@@ -96,18 +99,29 @@ class NewsListTile extends StatelessWidget {
                 child: SizedBox(
                   width: context.w(100),
                   height: context.w(100),
-                  child: Image.network(
-                    article.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade300,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: context.r(24),
-                      ),
-                    ),
-                  ),
+                  child: article.imageUrl.isEmpty
+                      ? Container(
+                          color: Colors.grey.shade300,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: context.r(24),
+                          ),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: article.imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: Colors.grey.shade200),
+                          errorWidget: (_, __, ___) => Container(
+                            color: Colors.grey.shade300,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: context.r(24),
+                            ),
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -117,4 +131,3 @@ class NewsListTile extends StatelessWidget {
     );
   }
 }
-

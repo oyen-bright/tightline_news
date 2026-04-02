@@ -1,13 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tightline_news/core/utils/responsive_size.dart';
-import 'package:tightline_news/features/news/domain/news_article.dart';
+import 'package:tightline_news/core/ui/layout/responsive_size.dart';
+import 'package:tightline_news/features/news/domain/entities/article.dart';
 
 class TopStoryCard extends StatelessWidget {
-  const TopStoryCard({
-    super.key,
-    required this.article,
-    required this.onTap,
-  });
+  const TopStoryCard({super.key, required this.article, required this.onTap});
 
   final NewsArticle article;
   final VoidCallback onTap;
@@ -30,16 +27,30 @@ class TopStoryCard extends StatelessWidget {
               flex: 3,
               child: Hero(
                 tag: 'article-image-${article.id}',
-                child: Image.network(
-                  article.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade300,
-                    alignment: Alignment.center,
-                    child: Icon(Icons.image_not_supported, size: context.r(48)),
-                  ),
-                ),
+                child: article.imageUrl.isEmpty
+                    ? Container(
+                        color: Colors.grey.shade300,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: context.r(48),
+                        ),
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: article.imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) =>
+                            Container(color: Colors.grey.shade200),
+                        errorWidget: (_, __, ___) => Container(
+                          color: Colors.grey.shade300,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: context.r(48),
+                          ),
+                        ),
+                      ),
               ),
             ),
             Expanded(
@@ -54,14 +65,14 @@ class TopStoryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (article.source.isNotEmpty)
+                    if (article.source.name.isNotEmpty)
                       Text(
-                        article.source.toUpperCase(),
+                        article.source.name.toUpperCase(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.grey.shade500,
-                              letterSpacing: 1.2,
-                            ),
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey.shade500,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     SizedBox(height: context.h(6)),
                     Expanded(
@@ -70,9 +81,9 @@ class TopStoryCard extends StatelessWidget {
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              height: 1.25,
-                            ),
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                        ),
                       ),
                     ),
                     SizedBox(height: context.h(8)),
@@ -115,4 +126,3 @@ class TopStoryCard extends StatelessWidget {
     );
   }
 }
-

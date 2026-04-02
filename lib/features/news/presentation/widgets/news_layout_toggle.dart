@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tightline_news/core/utils/responsive_size.dart';
+import 'package:tightline_news/core/ui/layout/responsive_size.dart';
 
 class NewsLayoutToggle extends StatelessWidget {
   const NewsLayoutToggle({
