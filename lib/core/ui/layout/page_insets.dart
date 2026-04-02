@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:tightline_news/core/utils/responsive_size.dart';
+import 'package:tightline_news/core/ui/layout/responsive_size.dart';
 
-/// Shared horizontal insets for top-level screens.
 class PageInsets {
   const PageInsets._();
 
@@ -13,4 +12,3 @@ class PageInsets {
         desktop: context.w(80),
       );
 }
-
