@@ -7,6 +7,7 @@ void main() {
       final json = {
         'title': 'Breaking: Flutter 4 Released',
         'description': 'Google announces Flutter 4.',
+        'url': 'https://example.com/article',
         'urlToImage': 'https://example.com/image.jpg',
         'source': {'name': 'TechCrunch'},
         'author': 'Jane Doe',
@@ -16,7 +17,7 @@ void main() {
 
       final article = NewsArticle.fromJson(json);
 
-      expect(article.id, '2025-01-15T10:30:00Z');
+      expect(article.id, 'https://example.com/article');
       expect(article.title, 'Breaking: Flutter 4 Released');
       expect(article.imageUrl, 'https://example.com/image.jpg');
       expect(article.source.name, 'TechCrunch');

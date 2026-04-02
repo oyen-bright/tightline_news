@@ -4,7 +4,7 @@ import 'package:tightline_news/core/ui/layout/responsive_size.dart';
 class StatusMessage extends StatelessWidget {
   const StatusMessage.loading({super.key})
     : iconData = null,
-      message = 'Loading articles...',
+      message = '',
       helperText = null;
 
   const StatusMessage.error({

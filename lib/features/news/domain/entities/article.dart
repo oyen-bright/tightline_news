@@ -49,7 +49,7 @@ class NewsArticle {
     );
 
     return NewsArticle(
-      id: '${json['publishedAt'] ?? json['title']}',
+      id: (json['url'] ?? json['publishedAt'] ?? json['title'] ?? '') as String,
       title: (json['title'] ?? '') as String,
       description: (json['description'] ?? '') as String,
       imageUrl: (json['urlToImage'] ?? json['imageUrl'] ?? '') as String,

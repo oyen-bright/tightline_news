@@ -71,7 +71,6 @@ void main() {
     await tester.pump();
 
     expect(find.byType(StatusMessage), findsOneWidget);
-    expect(find.text('Loading articles...'), findsOneWidget);
   });
 
   testWidgets('shows empty state when article list is empty', (tester) async {

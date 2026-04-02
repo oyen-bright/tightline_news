@@ -18,7 +18,7 @@ class LoggingInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (kDebugMode) {
       log(
-        '[${response.requestOptions.method}] ${response.requestOptions.uri} → ${response.statusCode}',
+        '[${response.requestOptions.method}] ${response.requestOptions.uri} → ${response.statusCode} ',
       );
     }
     super.onResponse(response, handler);
