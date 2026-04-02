@@ -1,0 +1,9 @@
+dev:
+  baseUrl: https://newsapi.org/v2/
+  apiKey: YOUR_DEV_KEY_HERE
+
+prod:
+  baseUrl: https://newsapi.org/v2/
+  apiKey: YOUR_PROD_KEY_HERE
+
+
